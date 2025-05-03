@@ -74,11 +74,23 @@ module.exports = class SolanaEventParser {
 
       if (log.startsWith(PROGRAM_DATA)) {
         const line = log.slice(PROGRAM_DATA.length)
+        let name = null
 
-        const layout = this.borsh.layout(line)
-        const data = this.borsh.decode(line, ['events', layout.name])
+        try {
+          const layout = this.borsh.layout(line)
 
-        return [{ name: layout.name, data }, null, false]
+          name = layout.name
+        } catch (err) {
+          if (err.message.includes('Discriminator not found')) {
+            return [null, null, false]
+          }
+
+          throw err
+        }
+
+        const data = this.borsh.decode(line, ['events', name])
+
+        return [{ name, data }, null, false]
       }
     }
 
