@@ -1,6 +1,6 @@
 {
   "name": "solana-event-parser",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Parse logs from a Solana transaction",
   "main": "index.js",
   "files": [],
