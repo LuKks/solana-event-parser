@@ -18,8 +18,9 @@
   },
   "homepage": "https://github.com/lukks/solana-event-parser#readme",
   "devDependencies": {
-    "borsh-encoding": "^0.1.3",
+    "borsh-encoding": "^1.2.0",
     "brittle": "^3.3.2",
+    "solana-idl": "^1.2.0",
     "standard": "^17.1.0"
   }
 }

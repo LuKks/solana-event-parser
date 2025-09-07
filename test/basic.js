@@ -1,10 +1,10 @@
 const test = require('brittle')
 const Borsh = require('borsh-encoding')
+const IDL = require('solana-idl')
 const EventParser = require('../index.js')
-const IDL_PUMP_AMM = require('./pump-amm.json')
 
 test('basic', async function (t) {
-  const borsh = new Borsh(IDL_PUMP_AMM)
+  const borsh = new Borsh(IDL.pump_amm)
   const programId = 'pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA'
 
   const eventParser = new EventParser(borsh, programId)
@@ -72,7 +72,7 @@ test('basic', async function (t) {
 })
 
 test('basic', async function (t) {
-  const borsh = new Borsh(IDL_PUMP_AMM)
+  const borsh = new Borsh(IDL.pump_amm)
   const programId = 'pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA'
 
   const eventParser = new EventParser(borsh, programId)
@@ -222,6 +222,49 @@ test('basic', async function (t) {
         user_quote_token_account: 'BuqEDKUwyAotZuK37V4JYEykZVKY8qo1zKbpfU9gkJMo',
         protocol_fee_recipient: 'JCRGumoE9Qi5BBgULTgdgTLjSgkCMSbF62ZZfGs84JeU',
         protocol_fee_recipient_token_account: 'DWpvfqzGWuVy9jVSKSShdM2733nrEsnnhsUStYbkj6Nn'
+      }
+    }
+  ])
+})
+
+test('raydium', async function (t) {
+  const borsh = new Borsh(IDL.raydium_amm)
+  const programId = '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8'
+
+  const eventParser = new EventParser(borsh, programId)
+
+  const logs = [
+    'Program ComputeBudget111111111111111111111111111111 invoke [1]',
+    'Program ComputeBudget111111111111111111111111111111 success',
+    'Program ComputeBudget111111111111111111111111111111 invoke [1]',
+    'Program ComputeBudget111111111111111111111111111111 success',
+    'Program 675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8 invoke [1]',
+    'Program log: ray_log: A8yH2OorBQAAAAAAAAAAAAACAAAAAAAAAO3FdcK3SQAA8q9iAW9Z+gCKDkbOPwAAAFKNUAEAAAAA',
+    'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [2]',
+    'Program log: Instruction: Transfer',
+    'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 4645 of 783958 compute units',
+    'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success',
+    'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [2]',
+    'Program log: Instruction: Transfer',
+    'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 4736 of 776844 compute units',
+    'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success',
+    'Program 675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8 consumed 28368 of 799700 compute units',
+    'Program 675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8 success'
+  ]
+
+  const events = eventParser.parse(logs)
+
+  t.alike(events, [
+    {
+      name: 'SwapBaseIn',
+      data: {
+        amountIn: 5686181791692n,
+        minimumOut: 0n,
+        direction: 2n,
+        userSource: 81053590341101n,
+        poolCoin: 70467077477150706n,
+        poolPc: 274043637386n,
+        outAmount: 22056274n
       }
     }
   ])

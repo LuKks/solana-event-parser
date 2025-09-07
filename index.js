@@ -4,6 +4,9 @@ const PROGRAM_SUCCESS_RE = /^Program ([1-9A-HJ-NP-Za-km-z]+) success$/
 const PROGRAM_LOG = 'Program log: '
 const PROGRAM_DATA = 'Program data: '
 
+// Exception support for Raydium AMM
+const PROGRAM_LOG_DATA = 'Program log: ray_log: '
+
 module.exports = class SolanaEventParser {
   constructor (borsh, programId) {
     this.borsh = borsh
@@ -68,16 +71,18 @@ module.exports = class SolanaEventParser {
   _handleLog (stack, log) {
     // Program log
     if (stack.length > 0 && stack[stack.length - 1] === this.programId.toString()) {
-      if (log.startsWith(PROGRAM_LOG)) {
+      const isLogData = log.startsWith(PROGRAM_LOG_DATA)
+
+      if (log.startsWith(PROGRAM_LOG) && !isLogData) {
         return [null, null, false]
       }
 
-      if (log.startsWith(PROGRAM_DATA)) {
-        const line = log.slice(PROGRAM_DATA.length)
+      if (log.startsWith(PROGRAM_DATA) || isLogData) {
+        const line = log.slice(!isLogData ? PROGRAM_DATA.length : PROGRAM_LOG_DATA.length)
         let name = null
 
         try {
-          const layout = this.borsh.layout(line)
+          const layout = this.borsh.layout(line, { ray: isLogData })
 
           name = layout.name
         } catch (err) {
@@ -88,7 +93,7 @@ module.exports = class SolanaEventParser {
           throw err
         }
 
-        const data = this.borsh.decode(line, ['events', name])
+        const data = this.borsh.decode(line, ['events', name], { ray: isLogData })
 
         return [{ name, data }, null, false]
       }
